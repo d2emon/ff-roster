@@ -1,21 +1,21 @@
 version: "3.9"
 
 services:
-  api-gateway:
-    build: ./services/api-gateway
-    container_name: api-gateway
-    ports:
-      - "3000:3000"
-    depends_on:
-      - auth-service
-      - characters-service
-      - game-engine
-    environment:
-      AUTH_PUBLIC_KEY_PATH: /keys/public.pem
-    volumes:
-      - ./infra/keys:/keys
-    networks:
-      - backend
+  # api-gateway:
+  #   build: ./services/api-gateway
+  #   container_name: api-gateway
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - auth-service
+  #     - characters-service
+  #     - game-engine
+  #   environment:
+  #     AUTH_PUBLIC_KEY_PATH: /keys/public.pem
+  #   volumes:
+  #     - ./infra/keys:/keys
+  #   networks:
+  #     - backend
 
   auth-service:
     build: ./services/auth
@@ -31,28 +31,28 @@ services:
     networks:
       - backend
 
-  characters-service:
-    build: ./services/characters
-    container_name: characters-service
-    environment:
-      DATABASE_URL: postgres://characters:characters@characters-db:5432/characters
-      GAME_ENGINE_URL: http://game-engine:3000
-      AUTH_PUBLIC_KEY_PATH: /keys/public.pem
-    volumes:
-      - ./infra/keys:/keys
-    depends_on:
-      - characters-db
-      - game-engine
-    networks:
-      - backend
+  # characters-service:
+  #   build: ./services/characters
+  #   container_name: characters-service
+  #   environment:
+  #     DATABASE_URL: postgres://characters:characters@characters-db:5432/characters
+  #     GAME_ENGINE_URL: http://game-engine:3000
+  #     AUTH_PUBLIC_KEY_PATH: /keys/public.pem
+  #   volumes:
+  #     - ./infra/keys:/keys
+  #   depends_on:
+  #     - characters-db
+  #     - game-engine
+  #   networks:
+  #     - backend
 
-  game-engine:
-    build: ./services/game-engine
-    container_name: game-engine
-    environment:
-      NODE_ENV: production
-    networks:
-      - backend
+  # game-engine:
+  #   build: ./services/game-engine
+  #   container_name: game-engine
+  #   environment:
+  #     NODE_ENV: production
+  #   networks:
+  #     - backend
 
   auth-db:
     image: postgres:16
@@ -66,17 +66,17 @@ services:
     networks:
       - backend
 
-  characters-db:
-    image: postgres:16
-    container_name: characters-db
-    environment:
-      POSTGRES_DB: characters
-      POSTGRES_USER: characters
-      POSTGRES_PASSWORD: characters
-    volumes:
-      - characters-db-data:/var/lib/postgresql/data
-    networks:
-      - backend
+  # characters-db:
+  #   image: postgres:16
+  #   container_name: characters-db
+  #   environment:
+  #     POSTGRES_DB: characters
+  #     POSTGRES_USER: characters
+  #     POSTGRES_PASSWORD: characters
+  #   volumes:
+  #     - characters-db-data:/var/lib/postgresql/data
+  #   networks:
+  #     - backend
 
 volumes:
   auth-db-data:

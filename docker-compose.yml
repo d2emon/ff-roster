@@ -47,11 +47,14 @@ services:
       AUTH_PUBLIC_KEY_PATH: /keys/public.pem
     volumes:
       - ./infra/keys:/keys
+      - ./services/characters/src:/app/src
     depends_on:
       - characters-db
-      - game-engine
+      # - game-engine
     networks:
       - backend
+    command:
+      npm run start:dev
 
   # game-engine:
   #   build: ./services/game-engine

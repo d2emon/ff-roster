@@ -20,16 +20,21 @@ services:
   auth-service:
     build: ./services/auth
     container_name: auth-service
+    ports:
+      - 4000:3000
     environment:
       DATABASE_URL: postgres://auth:auth@auth-db:5432/auth
       JWT_PRIVATE_KEY_PATH: /keys/private.pem
       JWT_PUBLIC_KEY_PATH: /keys/public.pem
     volumes:
       - ./infra/keys:/keys
+      - ./services/auth/src:/app/src
     depends_on:
       - auth-db
     networks:
       - backend
+    command:
+      npm run start:dev
 
   # characters-service:
   #   build: ./services/characters

@@ -1,8 +1,10 @@
 import * as bcrypt from 'bcrypt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RegisterDTO } from './dto/register.dto';
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,31 +14,54 @@ export class AuthService {
   ) {}
 
   private issueTokens(user: User) {
-    const accessToken = this.jwt.sign({
+    const payload = this.jwt.sign({
       sub: user.id,
       email: user.email,
     });
 
-    return accessToken;
+    return {
+      accessToken: payload,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    };
   }
 
-  async register(email: string, password: string) {
-    const hash = await bcrypt.hash(password, 10);
+  async register(dto: RegisterDTO) {
+    const exists = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (exists) {
+      throw new ConflictException('User already exists');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
     const user = await this.prisma.user.create({
-      data: { email, passwordHash: hash },
+      data: {
+        email: dto.email,
+        passwordHash,
+      },
     });
 
     return this.issueTokens(user);
   }
 
-  async login(email: string, password: string) {
+  async login(dto: LoginDTO) {
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: { email: dto.email },
     });
-    if (!user) throw new UnauthorizedException();
 
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) throw new UnauthorizedException();
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const valid = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     return this.issueTokens(user);
   }

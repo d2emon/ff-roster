@@ -36,20 +36,22 @@ services:
     command:
       npm run start:dev
 
-  # characters-service:
-  #   build: ./services/characters
-  #   container_name: characters-service
-  #   environment:
-  #     DATABASE_URL: postgres://characters:characters@characters-db:5432/characters
-  #     GAME_ENGINE_URL: http://game-engine:3000
-  #     AUTH_PUBLIC_KEY_PATH: /keys/public.pem
-  #   volumes:
-  #     - ./infra/keys:/keys
-  #   depends_on:
-  #     - characters-db
-  #     - game-engine
-  #   networks:
-  #     - backend
+  characters-service:
+    build: ./services/characters
+    container_name: characters-service
+    ports:
+      - 5000:3000
+    environment:
+      DATABASE_URL: postgres://characters:characters@characters-db:5432/characters
+      GAME_ENGINE_URL: http://game-engine:3000
+      AUTH_PUBLIC_KEY_PATH: /keys/public.pem
+    volumes:
+      - ./infra/keys:/keys
+    depends_on:
+      - characters-db
+      - game-engine
+    networks:
+      - backend
 
   # game-engine:
   #   build: ./services/game-engine
@@ -71,17 +73,17 @@ services:
     networks:
       - backend
 
-  # characters-db:
-  #   image: postgres:16
-  #   container_name: characters-db
-  #   environment:
-  #     POSTGRES_DB: characters
-  #     POSTGRES_USER: characters
-  #     POSTGRES_PASSWORD: characters
-  #   volumes:
-  #     - characters-db-data:/var/lib/postgresql/data
-  #   networks:
-  #     - backend
+  characters-db:
+    image: postgres:16
+    container_name: characters-db
+    environment:
+      POSTGRES_DB: characters
+      POSTGRES_USER: characters
+      POSTGRES_PASSWORD: characters
+    volumes:
+      - characters-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
 
 volumes:
   auth-db-data:
